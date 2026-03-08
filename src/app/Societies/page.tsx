@@ -38,9 +38,9 @@ type Society = typeof societies[0];
 
 // ─── Dropdown Menu ────────────────────────────────────────────────────────────
 
-function DropdownMenu({ onClose, onView, onEdit, onDelete, onSuspend, anchorRect }: {
+function DropdownMenu({ onClose, onView, onEdit, onDelete, onSuspend, anchorRect, status }: {
   onClose: () => void; onView: () => void; onEdit: () => void;
-  onDelete: () => void; onSuspend: () => void; anchorRect: DOMRect;
+  onDelete: () => void; onSuspend: () => void; anchorRect: DOMRect; status: string;
 }) {
   const ref = useRef<HTMLDivElement>(null);
 
@@ -83,7 +83,7 @@ function DropdownMenu({ onClose, onView, onEdit, onDelete, onSuspend, anchorRect
           to   { opacity: 1; transform: scale(1) translateY(0); }
         }
       `}</style>
-      {menuActions.map((label) => (
+      {menuActions.filter(label => !(label === "Suspend" && status === "Suspended")).map((label) => (
         <button key={label} onClick={() => handleAction(label)} className={dropdown.menuItem}>
           {label}
         </button>
@@ -314,6 +314,11 @@ export default function SocietiesPage() {
     s.admin.toLowerCase().includes(searchVal.toLowerCase())
   );
 
+  // Navigate to detail page
+  const handleRowClick = (s: Society) => {
+    router.push(`/Societies/${s.id}`);
+  };
+
   return (
     <div className={page.wrapper}>
       <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet" />
@@ -365,7 +370,11 @@ export default function SocietiesPage() {
                 </thead>
                 <tbody>
                   {filtered.map((s, i) => (
-                    <tr key={i} className={table.tr}>
+                    <tr
+                      key={i}
+                      className={`${table.tr} cursor-pointer hover:bg-[#FAFAFA] transition-colors duration-100`}
+                      onClick={() => handleRowClick(s)}
+                    >
                       <td className={table.td}>{s.name}</td>
                       <td className={table.tdAdmin}>
                         <div className={table.tdAdminWrap}>
@@ -379,9 +388,14 @@ export default function SocietiesPage() {
                           {s.status}
                         </span>
                       </td>
-                      <td className={table.tdActions}>
+                      <td
+                        className={table.tdActions}
+                        // Stop row click from firing when interacting with the actions cell
+                        onClick={e => e.stopPropagation()}
+                      >
                         <button
                           onClick={e => {
+                            e.stopPropagation();
                             const rect = e.currentTarget.getBoundingClientRect();
                             setOpenMenu(openMenu?.index === i ? null : { index: i, rect });
                           }}
@@ -401,6 +415,7 @@ export default function SocietiesPage() {
                             onEdit={() => { setOpenMenu(null); setEditSociety(s); }}
                             onDelete={() => { setOpenMenu(null); setDeleteSociety(s); }}
                             onSuspend={() => { setOpenMenu(null); setSuspendSociety(s); }}
+                            status={s.status}
                           />
                         )}
                       </td>

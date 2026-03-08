@@ -10,9 +10,9 @@ const montserrat = Montserrat({ subsets: ["latin"] });
 const navItems = [
   { label: "Dashboard",           icon: "/sidebar/home.png",      href: "/Dashboard"      },
   { label: "Societies",           icon: "/sidebar/societies.png", href: "/Societies"      },
-  // { label: "Resident Admin",      icon: "/sidebar/resident.png",  href: "/resident-admin" },
-  // { label: "Payment and Finance", icon: "/sidebar/payment.png",   href: "/payments"       },
-  // { label: "Support Ticket",      icon: "/sidebar/support.png",   href: "/support"        },
+  { label: "Resident Admin",      icon: "/sidebar/resident.png",  href: "/resident-admin" },
+  { label: "Payment and Finance", icon: "/sidebar/payment.png",   href: "/payments"       },
+  { label: "Support Ticket",      icon: "/sidebar/support.png",   href: "/support"        },
   // { label: "Settings",            icon: "/sidebar/setting.png",   href: "/settings"       },
   // { label: "Privacy Policy",      icon: "/sidebar/privacy.png",   href: "/privacy-policy" },
   // { label: "Terms of Service",    icon: "/sidebar/terms.png",     href: "/terms"          },
