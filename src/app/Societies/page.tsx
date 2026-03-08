@@ -348,7 +348,7 @@ export default function SocietiesPage() {
             </svg>
             <input
               type="text"
-              placeholder="Search societies, admins, payments"
+              placeholder="Search societies"
               value={searchVal}
               onChange={e => setSearchVal(e.target.value)}
               className={search.input}

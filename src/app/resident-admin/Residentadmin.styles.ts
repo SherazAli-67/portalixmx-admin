@@ -14,7 +14,7 @@ export const header = {
 
 export const search = {
   wrapper:      "relative mb-4 sm:mb-5 w-full sm:w-[300px]",
-  icon:         "absolute left-[14px] top-1/2 -translate-y-1/2 text-[#999]",
+  icon:         "absolute left-[14px] top-1/2 -translate-y-1/2 text-[#383838]",
   input:        "w-full pl-9 pr-5 py-[11px] bg-white rounded-full text-[11px] text-[#111] outline-none font-[inherit] box-border",
 };
 
@@ -33,8 +33,8 @@ export const table = {
   adminName:    "text-[12px] sm:text-[13px] text-[#1C1C1C] whitespace-nowrap",
   td:           "py-[11px] sm:py-[13px] px-3 sm:px-5 text-[12px] sm:text-[13px] text-[#1C1C1C] whitespace-nowrap border-b border-[#F0F0F0]",
   tdStatus:     "py-[11px] sm:py-[13px] px-3 sm:px-5 whitespace-nowrap border-b border-[#F0F0F0]",
-  statusActive: "text-[12px] sm:text-[13px] font-semibold text-[#0AB024]",
-  statusSusp:   "text-[12px] sm:text-[13px] font-semibold text-[#E87A00]",
+  statusActive: "text-[12px] sm:text-[13px]  text-[#0AB024]",
+  statusSusp:   "text-[12px] sm:text-[13px]  text-[#E87A00]",
   tdActions:    "py-[11px] sm:py-[13px] px-3 sm:px-5 text-right whitespace-nowrap border-b border-[#F0F0F0]",
   menuBtn:      "bg-transparent border-none cursor-pointer p-1 rounded-md text-[#374151]",
   emptyCell:    "py-10 px-5 text-center text-[12px] text-[#9CA3AF]",

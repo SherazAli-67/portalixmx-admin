@@ -17,7 +17,7 @@ export const header = {
 // ─── Search bar ──────────────────────────────────────────────────────────────
 export const search = {
   wrapper:      "relative mb-4 sm:mb-5 w-full sm:w-[300px]",
-  icon:         "absolute left-[14px] top-1/2 -translate-y-1/2 text-[#999]",
+  icon:         "absolute left-[14px] top-1/2 -translate-y-1/2 text-[#383838]",
   input:        "w-full pl-9 pr-5 py-[11px] bg-white rounded-full text-[11px] text-[#111] outline-none font-[inherit] box-border",
 };
 
