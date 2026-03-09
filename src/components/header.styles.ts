@@ -27,6 +27,6 @@ export const logoutModal = {
   closeBtn:       "text-black hover:text-black transition-colors",
   body:           "text-[12px] sm:text-[13px] text-black text-center leading-[1.6] mb-8 sm:mb-12",
   btnRow:         "flex items-center gap-3",
-  cancelBtn:      "flex-1 py-[10px] rounded-full bg-[#F0F0F0] text-[12px] font-medium text-[#515355] hover:bg-[#E5E5E5] transition-colors duration-150",
-  confirmBtn:     "flex-1 py-[10px] rounded-full bg-[#E87A00] text-[12px] font-medium text-white hover:bg-[#EA6C0E] transition-colors duration-150",
+  cancelBtn:      "flex-1 py-[10px] rounded-full bg-[#F0F0F0] text-[12px] text-[#515355] hover:bg-[#E5E5E5] transition-colors duration-150",
+  confirmBtn:     "flex-1 py-[10px] rounded-full bg-[#E87A00] text-[12px] text-white hover:bg-[#EA6C0E] transition-colors duration-150",
 };

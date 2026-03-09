@@ -68,11 +68,11 @@ export const modal = {
   select:       "w-full px-[14px] py-[10px] sm:py-[11px] rounded-[10px] border-none bg-[#F9F9F9] text-[12px] text-[#A8A9AA] outline-none font-[inherit] box-border appearance-none cursor-pointer focus:bg-[#F0F0F0] transition-colors",
   selectIcon:   "absolute right-[14px] top-1/2 -translate-y-1/2 pointer-events-none",
   btnRow:       "flex gap-3 sm:gap-5 mt-2",
-  cancelBtn:    "flex-1 py-[10px] rounded-full border border-[#E8E8E8] bg-[#F5F5F5] hover:bg-[#EBEBEB] text-[12px] font-medium text-[#555] cursor-pointer font-[inherit] transition-colors duration-150",
-  submitBtn:    "flex-1 py-[10px] rounded-full border-none text-[12px] font-semibold text-white cursor-pointer font-[inherit] transition-colors duration-150",
+  cancelBtn:    "flex-1 py-[10px] rounded-full  bg-[#F5F5F5] hover:bg-[#EBEBEB] text-[12px]  text-[#555] cursor-pointer font-[inherit] transition-colors duration-150",
+  submitBtn:    "flex-1 py-[10px] rounded-full border-none text-[12px] text-white cursor-pointer font-[inherit] transition-colors duration-150",
   submitActive: "bg-[#E87A00] hover:bg-[#D06A00]",
   submitDisabled:"bg-[#F5C380] cursor-not-allowed",
-  saveBtn:      "flex-1 py-[10px] rounded-full border-none bg-[#E87A00] hover:bg-[#D06A00] text-[12px] font-semibold text-white cursor-pointer font-[inherit] transition-colors duration-150",
+  saveBtn:      "flex-1 py-[10px] rounded-full border-none bg-[#E87A00] hover:bg-[#D06A00] text-[12px]  text-white cursor-pointer font-[inherit] transition-colors duration-150",
 };
 
 // ─── Confirm modal (Delete / Suspend) ─────────────────────────────────────────
@@ -85,6 +85,6 @@ export const confirm = {
   closeBtn:     "text-black border-none bg-transparent cursor-pointer flex",
   body:         "text-[12px] sm:text-[13px] text-black text-center leading-[1.6] mb-8 sm:mb-12",
   btnRow:       "flex items-center gap-3 sm:gap-5",
-  cancelBtn:    "flex-1 py-[10px] rounded-full bg-[#F0F0F0] hover:bg-[#E5E5E5] text-[12px] font-medium text-[#515355] border-none cursor-pointer font-[inherit] transition-colors duration-150",
-  confirmBtn:   "flex-1 py-[10px] rounded-full text-[12px] font-medium text-white border-none cursor-pointer font-[inherit] transition-colors duration-150",
+  cancelBtn:    "flex-1 py-[10px] rounded-full bg-[#F0F0F0] hover:bg-[#E5E5E5] text-[12px]  text-[#515355] border-none cursor-pointer font-[inherit] transition-colors duration-150",
+  confirmBtn:   "flex-1 py-[10px] rounded-full text-[12px]  text-white border-none cursor-pointer font-[inherit] transition-colors duration-150",
 };

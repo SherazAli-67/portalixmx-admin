@@ -53,6 +53,6 @@ export const confirm = {
   closeBtn:     "text-black border-none bg-transparent cursor-pointer flex",
   body:         "text-[12px] sm:text-[13px] text-black text-center leading-[1.6] mb-8 sm:mb-12",
   btnRow:       "flex items-center gap-3 sm:gap-5",
-  cancelBtn:    "flex-1 py-[10px] rounded-full bg-[#F0F0F0] hover:bg-[#E5E5E5] text-[12px] font-medium text-[#515355] border-none cursor-pointer font-[inherit] transition-colors duration-150",
-  confirmBtn:   "flex-1 py-[10px] rounded-full text-[12px] font-medium text-white border-none cursor-pointer font-[inherit] transition-colors duration-150",
+  cancelBtn:    "flex-1 py-[10px] rounded-full bg-[#F0F0F0] hover:bg-[#E5E5E5] text-[12px] text-[#515355] border-none cursor-pointer font-[inherit] transition-colors duration-150",
+  confirmBtn:   "flex-1 py-[10px] rounded-full text-[12px]  text-white border-none cursor-pointer font-[inherit] transition-colors duration-150",
 };

@@ -61,7 +61,7 @@ export const modal = {
   adminAvatar:    "w-6 h-6 rounded-full object-cover shrink-0",
   adminName:      "text-[12px] text-[#1C1C1C]",
   footerRow:      "flex items-center gap-5 mt-4",
-  cancelBtn:      "flex-1 py-[11px] rounded-full text-[#555] text-[13px] font-semibold border-none cursor-pointer font-[inherit] bg-[#F0F0F0] hover:opacity-80 transition-opacity duration-150",
-  closeActionBtn: "block mx-auto px-10 py-[11px] rounded-full text-white text-[13px] font-semibold border-none cursor-pointer font-[inherit] mt-2 bg-[#E87A00] hover:opacity-90 transition-opacity duration-150",
-  exportBtn:      "flex-1 py-[11px] rounded-full text-white text-[13px] font-semibold border-none cursor-pointer font-[inherit] bg-[#E87A00] hover:opacity-90 transition-opacity duration-150",
+  cancelBtn:      "flex-1 py-[11px] rounded-full text-[#555] text-[13px]  border-none cursor-pointer font-[inherit] bg-[#F0F0F0] hover:opacity-80 transition-opacity duration-150",
+  closeActionBtn: "block mx-auto px-10 py-[11px] rounded-full text-white text-[13px]  border-none cursor-pointer font-[inherit] mt-2 bg-[#E87A00] hover:opacity-90 transition-opacity duration-150",
+  exportBtn:      "flex-1 py-[11px] rounded-full text-white text-[13px]  border-none cursor-pointer font-[inherit] bg-[#E87A00] hover:opacity-90 transition-opacity duration-150",
 };

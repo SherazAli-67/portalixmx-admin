@@ -1,0 +1,23 @@
+/* ── Privacy Policy Editor bullet fix ── */
+[data-policy-editor] ul {
+  list-style: disc !important;
+  padding-left: 1.5rem !important;
+  margin: 0.5rem 0 !important;
+}
+[data-policy-editor] ol {
+  list-style: decimal !important;
+  padding-left: 1.5rem !important;
+  margin: 0.5rem 0 !important;
+}
+[data-policy-editor] li {
+  display: list-item !important;
+  margin-bottom: 4px !important;
+}
+[data-policy-editor] p {
+  margin-bottom: 8px !important;
+}
+
+/* ✅ Bullet dot size chota karna */
+[data-policy-editor] ul li::marker {
+  font-size: 2px !important;  /* 👈 change karo as needed */
+}

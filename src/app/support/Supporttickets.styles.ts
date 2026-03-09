@@ -83,8 +83,8 @@ export const modal = {
   replyTitle:     "text-[14px] font-semibold text-[#1C1C1C] mb-2",
   textarea:       "w-full px-[14px] py-[8px] rounded-[10px] border-none bg-[#F9F9F9] text-[12px] text-[#A8A9AA] outline-none font-[inherit] box-border resize-none min-h-[70px] placeholder:text-[#BDBDBD]",
   btnRow:         "flex items-center gap-5 mt-3",
-  cancelBtn:      "flex-1 py-[10px] rounded-full border-none bg-[#F5F5F5] hover:bg-[#EBEBEB] text-[12px] font-medium text-[#555] cursor-pointer font-[inherit] transition-colors duration-150",
+  cancelBtn:      "flex-1 py-[10px] rounded-full border-none bg-[#F5F5F5] hover:bg-[#EBEBEB] text-[12px] text-[#555] cursor-pointer font-[inherit] transition-colors duration-150",
 
-  closeTicketBtn: "flex-1 py-[10px] rounded-full border-none bg-[#FF4444] hover:bg-[#E03030] text-[12px] font-semibold text-white cursor-pointer font-[inherit] transition-colors duration-150",
-  sendBtn:        "flex-1 py-[10px] rounded-full border-none bg-[#E87A00] hover:bg-[#D06A00] text-[12px] font-semibold text-white cursor-pointer font-[inherit] transition-colors duration-150",
+  closeTicketBtn: "flex-1 py-[10px] rounded-full border-none bg-[#FF4444] hover:bg-[#E03030] text-[12px]  text-white cursor-pointer font-[inherit] transition-colors duration-150",
+  sendBtn:        "flex-1 py-[10px] rounded-full border-none bg-[#E87A00] hover:bg-[#D06A00] text-[12px]  text-white cursor-pointer font-[inherit] transition-colors duration-150",
 };
