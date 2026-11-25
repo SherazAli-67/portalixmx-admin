@@ -4,6 +4,7 @@ import { Montserrat } from "next/font/google";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { sidebar as s } from "./sidebar.styles";
+import { useAuth } from "@/context/AuthContext";
 
 const montserrat = Montserrat({ subsets: ["latin"] });
 
@@ -27,6 +28,7 @@ interface SidebarProps {
 
 export default function Sidebar({ activeNav, setActiveNav, isOpen = false, onClose }: SidebarProps) {
   const pathname = usePathname();
+  const { admin } = useAuth();
 
   return (
     <>
@@ -71,10 +73,10 @@ export default function Sidebar({ activeNav, setActiveNav, isOpen = false, onClo
         {/* Bottom user */}
         <div className={s.bottomWrap}>
           <div className={s.userCard}>
-            <img src="/sidebar/profile.jpg" alt="Admin Avatar" className={s.userAvatar} />
+            <img src={admin?.photoURL || "/sidebar/profile.jpg"} alt="Admin Avatar" className={s.userAvatar} />
             <div className={s.userInfo}>
-              <p className={s.userName}>Portalix Admin</p>
-              <p className={s.userEmail}>Portalix01@mail.com</p>
+              <p className={s.userName}>{admin?.name || "Portalix Admin"}</p>
+              <p className={s.userEmail}>{admin?.email || "Portalix01@mail.com"}</p>
             </div>
           </div>
         </div>

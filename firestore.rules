@@ -5,6 +5,12 @@ service cloud.firestore {
     function isSignedIn() {
       return request.auth != null;
     }
+    // Platform Super Admins are listed in /super-admins/{uid}.
+    // Created manually in the Firebase console; no client can write it.
+    function isSuperAdmin() {
+      return isSignedIn()
+        && exists(/databases/$(database)/documents/super-admins/$(request.auth.uid));
+    }
     function isOwner(uid) {
       return isSignedIn() && request.auth.uid == uid;
     }
@@ -63,6 +69,13 @@ service cloud.firestore {
              == resource.data.get('zkProvisionedAt', null)
         && request.resource.data.get('zkAccLevelIds', [])
              == resource.data.get('zkAccLevelIds', []);
+    }
+
+    // -------- super-admins --------
+    // Doc ID must be the Firebase Auth UID. Clients may only read their own doc.
+    match /super-admins/{uid} {
+      allow get: if isSignedIn() && request.auth.uid == uid;
+      allow list, create, update, delete: if false;
     }
 
     // -------- societies --------

@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import { Montserrat } from "next/font/google";
 import { page, card, form, forgotModal as fm } from "./login.styles";
 import Spinner from "@/components/Spinner";
+import { useAuth } from "@/context/AuthContext";
+import { getAuthErrorMessage, getResetErrorMessage } from "@/lib/auth-errors";
 import "@/styles/animations.css";
 
 const montserrat = Montserrat({ subsets: ["latin"] });
@@ -18,18 +20,20 @@ export default function LoginPage() {
   const [adminEmail, setAdminEmail]     = useState("");
   const [resetLoading, setResetLoading] = useState(false);
   const [resetSuccess, setResetSuccess] = useState(false);
+  const [resetError, setResetError] = useState("");
 
   const router = useRouter();
+  const { signIn, sendResetEmail } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setError("");
     try {
-      await new Promise((res) => setTimeout(res, 1000));
+      await signIn(email.trim(), password);
       router.push("/Dashboard");
-    } catch {
-      setError("Invalid credentials. Please try again.");
+    } catch (err) {
+      setError(getAuthErrorMessage(err));
     } finally {
       setIsLoading(false);
     }
@@ -38,11 +42,12 @@ export default function LoginPage() {
   const handleForgotPassword = async (e: React.FormEvent) => {
     e.preventDefault();
     setResetLoading(true);
+    setResetError("");
     try {
-      await new Promise((res) => setTimeout(res, 1000));
+      await sendResetEmail(adminEmail.trim());
       setResetSuccess(true);
-    } catch {
-      // handle error
+    } catch (err) {
+      setResetError(getResetErrorMessage(err));
     } finally {
       setResetLoading(false);
     }
@@ -53,6 +58,7 @@ export default function LoginPage() {
     setAdminEmail("");
     setResetSuccess(false);
     setResetLoading(false);
+    setResetError("");
   };
 
   return (
@@ -168,6 +174,7 @@ export default function LoginPage() {
                 </div>
               ) : (
                 <form onSubmit={handleForgotPassword} className={fm.formWrap}>
+                  {resetError && <div className={form.errorBox}>{resetError}</div>}
                   <div className={fm.fieldWrap}>
                     <label className={fm.label}>Enter Admin Email</label>
                     <input

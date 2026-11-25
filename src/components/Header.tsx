@@ -2,7 +2,8 @@
 
 import { Montserrat } from "next/font/google";
 import { useState, useRef, useEffect } from "react";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { useAuth } from "@/context/AuthContext";
 import { header as h, dropdown as dd, logoutModal as lm } from "./header.styles";
 
 const montserrat = Montserrat({ subsets: ["latin"] });
@@ -19,6 +20,8 @@ export default function Header({ search, setSearch, onLogout, onMenuOpen }: Head
   const [logoutModalOpen, setLogoutModalOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
+  const router = useRouter();
+  const { admin, signOut } = useAuth();
 
   const showSearch = pathname === "/Dashboard";
 
@@ -32,9 +35,11 @@ export default function Header({ search, setSearch, onLogout, onMenuOpen }: Head
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const handleLogoutConfirm = () => {
+  const handleLogoutConfirm = async () => {
     setLogoutModalOpen(false);
     onLogout?.();
+    await signOut();
+    router.replace("/Login");
   };
 
   return (
@@ -70,7 +75,7 @@ export default function Header({ search, setSearch, onLogout, onMenuOpen }: Head
         {/* Avatar + Dropdown */}
         <div className={h.avatarWrap} ref={dropdownRef}>
           <img
-            src="/sidebar/profile.jpg"
+            src={admin?.photoURL || "/sidebar/profile.jpg"}
             alt="Admin Avatar"
             onClick={() => setDropdownOpen((prev) => !prev)}
             className={h.avatar}
