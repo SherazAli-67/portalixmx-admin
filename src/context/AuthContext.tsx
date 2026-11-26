@@ -17,7 +17,7 @@ import {
   type User,
 } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
-import { auth, db } from "@/lib/firebase";
+import { auth, db, ensureAppCheck } from "@/lib/firebase";
 import { NotAuthorizedError } from "@/lib/auth-errors";
 
 /** Profile of a signed-in Super Admin (document `super-admins/{uid}`). */
@@ -45,6 +45,9 @@ const AuthContext = createContext<AuthContextValue | null>(null);
  * The document is the single source of truth for "is this user a Super Admin".
  */
 async function loadAdmin(user: User): Promise<AdminProfile | null> {
+  // App Check token must be present before Firestore when enforcement is on.
+  await ensureAppCheck();
+
   // Ensure the Auth ID token is attached before Firestore evaluates rules.
   // Without this, getDoc can race and return permission-denied right after sign-in.
   const token = await user.getIdToken(true);
@@ -83,30 +86,47 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      if (!user) {
-        setAdmin(null);
-        setLoading(false);
-        return;
-      }
+    let unsubscribe = () => {};
+    let cancelled = false;
+
+    (async () => {
       try {
-        const profile = await loadAdmin(user);
-        if (!profile) {
-          // Signed in to Firebase (e.g. a Resident Admin) but not a Super Admin.
-          await firebaseSignOut(auth);
-        }
-        setAdmin(profile);
-      } catch {
-        await firebaseSignOut(auth);
-        setAdmin(null);
-      } finally {
-        setLoading(false);
+        await ensureAppCheck();
+      } catch (err) {
+        console.error("[auth] App Check init failed", err);
       }
-    });
-    return unsubscribe;
+      if (cancelled) return;
+
+      unsubscribe = onAuthStateChanged(auth, async (user) => {
+        if (!user) {
+          setAdmin(null);
+          setLoading(false);
+          return;
+        }
+        try {
+          const profile = await loadAdmin(user);
+          if (!profile) {
+            // Signed in to Firebase (e.g. a Resident Admin) but not a Super Admin.
+            await firebaseSignOut(auth);
+          }
+          setAdmin(profile);
+        } catch {
+          await firebaseSignOut(auth);
+          setAdmin(null);
+        } finally {
+          setLoading(false);
+        }
+      });
+    })();
+
+    return () => {
+      cancelled = true;
+      unsubscribe();
+    };
   }, []);
 
   const signIn = useCallback(async (email: string, password: string) => {
+    await ensureAppCheck();
     const cred = await signInWithEmailAndPassword(auth, email, password);
     // Force a fresh token so Firestore rules see request.auth immediately.
     await cred.user.getIdToken(true);
