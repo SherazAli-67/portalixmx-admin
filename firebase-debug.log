@@ -1,0 +1,67 @@
+[debug] [2026-11-28T13:13:40.752Z] ----------------------------------------------------------------------
+[debug] [2026-11-28T13:13:40.753Z] Command:       /opt/homebrew/Cellar/node/25.2.0/bin/node /opt/homebrew/bin/firebase deploy --only storage
+[debug] [2026-11-28T13:13:40.753Z] CLI Version:   14.25.0
+[debug] [2026-11-28T13:13:40.753Z] Platform:      darwin
+[debug] [2026-11-28T13:13:40.753Z] Node Version:  v25.2.0
+[debug] [2026-11-28T13:13:40.753Z] Time:          Sat Nov 28 2026 18:13:40 GMT+0500 (Pakistan Standard Time)
+[debug] [2026-11-28T13:13:40.753Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2026-11-28T13:13:40.754Z] >>> [apiv2][query] GET https://firebase-public.firebaseio.com/cli.json [none]
+[debug] [2026-11-28T13:13:40.827Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2026-11-28T13:13:40.827Z] > authorizing via signed-in user (soomrosheraz054@gmail.com)
+[debug] [2026-11-28T13:13:40.827Z] [iam] checking project portalixmx-project for permissions ["firebase.projects.get","firebaserules.releases.create","firebaserules.releases.update","firebaserules.rulesets.create"]
+[debug] [2026-11-28T13:13:40.827Z] Checked if tokens are valid: false, expires at: 1795635510545
+[debug] [2026-11-28T13:13:40.827Z] Checked if tokens are valid: false, expires at: 1795635510545
+[debug] [2026-11-28T13:13:40.827Z] > refreshing access token with scopes: []
+[debug] [2026-11-28T13:13:40.828Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2026-11-28T13:13:40.828Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2026-11-28T13:13:41.416Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2026-11-28T13:13:41.416Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[error] Authentication Error: Your credentials are no longer valid. Please run firebase login --reauth
+
+For CI servers and headless environments, generate a new token with firebase login:ci
+[debug] [2026-11-28T13:13:41.418Z] [iam] error while checking permissions, command may fail: Authentication Error: Your credentials are no longer valid. Please run firebase login --reauth
+
+For CI servers and headless environments, generate a new token with firebase login:ci
+[info] 
+[info] === Deploying to 'portalixmx-project'...
+[info] 
+[info] i  deploying storage 
+[info] i  storage: ensuring required API firebasestorage.googleapis.com is enabled... 
+[debug] [2026-11-28T13:13:41.420Z] Checked if tokens are valid: true, expires at: 1795875220416
+[debug] [2026-11-28T13:13:41.420Z] Checked if tokens are valid: true, expires at: 1795875220416
+[debug] [2026-11-28T13:13:41.420Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/portalixmx-project/services/firebasestorage.googleapis.com [none]
+[debug] [2026-11-28T13:13:41.420Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/portalixmx-project/services/firebasestorage.googleapis.com x-goog-quota-user=projects/portalixmx-project
+[debug] [2026-11-28T13:13:42.018Z] <<< [apiv2][status] GET https://firebase-public.firebaseio.com/cli.json 403
+[debug] [2026-11-28T13:13:42.018Z] <<< [apiv2][body] GET https://firebase-public.firebaseio.com/cli.json "Blocked by sandbox network policy\nDestination: firebase-public.firebaseio.com:443\nReason: not on allow list\n"
+[warn] ⚠  Unable to fetch the CLI MOTD and remote config. This is not a fatal error, but may indicate an issue with your network connection. 
+[debug] [2026-11-28T13:13:42.019Z] Failed to fetch MOTD FirebaseError: Unable to parse JSON: SyntaxError: Unexpected token 'B', "Blocked by"... is not valid JSON
+[debug] [2026-11-28T13:13:43.210Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/portalixmx-project/services/firebasestorage.googleapis.com 200
+[debug] [2026-11-28T13:13:43.210Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/portalixmx-project/services/firebasestorage.googleapis.com [omitted]
+[info] ✔  storage: required API firebasestorage.googleapis.com is enabled 
+[debug] [2026-11-28T13:13:43.221Z] Error: EPERM: operation not permitted, open '/Users/sheraz-ali/.config/configstore/firebase-tools.json.2403656137'
+    at Object.openSync (node:fs:555:18)
+    at writeFile.writeFileSync [as sync] (/opt/homebrew/lib/node_modules/firebase-tools/node_modules/write-file-atomic/index.js:205:13)
+    at set all (/opt/homebrew/lib/node_modules/firebase-tools/node_modules/configstore/index.js:61:20)
+    at Configstore.set (/opt/homebrew/lib/node_modules/firebase-tools/node_modules/configstore/index.js:91:12)
+    at cacheEnabledAPI (/opt/homebrew/lib/node_modules/firebase-tools/lib/ensureApiEnabled.js:143:31)
+    at check (/opt/homebrew/lib/node_modules/firebase-tools/lib/ensureApiEnabled.js:34:9)
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at async ensure (/opt/homebrew/lib/node_modules/firebase-tools/lib/ensureApiEnabled.js:108:23)
+    at async Object.getDefaultBucket (/opt/homebrew/lib/node_modules/firebase-tools/lib/gcp/storage.js:16:5)
+    at async default_1 (/opt/homebrew/lib/node_modules/firebase-tools/lib/deploy/storage/prepare.js:30:31)
+[error] 
+[error] Error: An unexpected error has occurred.
+[debug] [2026-11-28T13:13:43.489Z] Error: EPERM: operation not permitted, open '/Users/sheraz-ali/.config/configstore/firebase-tools.json.1728675281'
+    at Object.openSync (node:fs:555:18)
+    at writeFile.writeFileSync [as sync] (/opt/homebrew/lib/node_modules/firebase-tools/node_modules/write-file-atomic/index.js:205:13)
+    at set all (/opt/homebrew/lib/node_modules/firebase-tools/node_modules/configstore/index.js:61:20)
+    at Configstore.delete (/opt/homebrew/lib/node_modules/firebase-tools/node_modules/configstore/index.js:101:12)
+    at process.<anonymous> (/opt/homebrew/lib/node_modules/firebase-tools/lib/bin/cli.js:65:45)
+    at process.emit (node:events:520:35)
+    at process.exit (node:internal/process/per_thread:236:15)
+    at Timeout._onTimeout (/opt/homebrew/lib/node_modules/firebase-tools/lib/errorOut.js:20:17)
+    at listOnTimeout (node:internal/timers:605:17)
+    at process.processTimers (node:internal/timers:541:7)
+[error] 
+[error] Error: An unexpected error has occurred.

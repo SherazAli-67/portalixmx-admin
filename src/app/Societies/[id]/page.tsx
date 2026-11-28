@@ -1,43 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Montserrat } from "next/font/google";
 import { useParams, useRouter } from "next/navigation";
 import Sidebar from "@/components/Sidebar";
 import Header from "@/components/Header";
 import { page, breadcrumb, layout, leftPanel, rightPanel, resTable } from "./societyDetail.styles";
+import { fetchAdmin, fetchSociety, fetchSocietyResidents, toSociety } from "@/services/societies";
+import type { Resident, Society } from "@/types/society";
 
 const montserrat = Montserrat({ subsets: ["latin"] });
-
-interface Society {
-  id: string; name: string; admin: string; adminEmail: string;
-  adminAvatar: string; residents: number; status: string;
-  location: string; created: string; image: string;
-}
-interface Resident {
-  name: string; email: string; unit: string;
-  phone: string; status: string; avatar: string;
-}
-
-const societies: Society[] = [
-  { id: "1", name: "Ikoyi Phase 1",   admin: "Alex Johnson",   adminEmail: "alexjohn@mail.com", adminAvatar: "https://i.pravatar.cc/150?img=11", residents: 120, status: "Active",    location: "Tanke, Ilorin united state", created: "Feb 01, 2026", image: "https://images.unsplash.com/photo-1582268611958-ebfd161ef9cf?w=400&q=80" },
-  { id: "2", name: "Lekki Garden",    admin: "Sarah Williams", adminEmail: "sarah@mail.com",     adminAvatar: "https://i.pravatar.cc/150?img=47", residents: 101, status: "Suspended", location: "Lekki, Lagos",               created: "Mar 10, 2025", image: "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=400&q=80" },
-  { id: "3", name: "Palmview Estate", admin: "Chinedu Obi",    adminEmail: "chinedu@mail.com",   adminAvatar: "https://i.pravatar.cc/150?img=14", residents: 98,  status: "Active",    location: "Abuja, FCT",                 created: "Jan 15, 2025", image: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=400&q=80" },
-  { id: "4", name: "Emerald Park",    admin: "Nkechi Eze",     adminEmail: "nkechi@mail.com",    adminAvatar: "https://i.pravatar.cc/150?img=44", residents: 80,  status: "Active",    location: "Port Harcourt, Rivers",      created: "Apr 20, 2025", image: "https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=400&q=80" },
-  { id: "5", name: "Rosewood Estate", admin: "Halima Musa",    adminEmail: "halima@mail.com",    adminAvatar: "https://i.pravatar.cc/150?img=25", residents: 100, status: "Active",    location: "Kano, Kano State",           created: "Jun 05, 2025", image: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=400&q=80" },
-  { id: "6", name: "Harmony Court",   admin: "Kelechi Onu",    adminEmail: "kelechi@mail.com",   adminAvatar: "https://i.pravatar.cc/150?img=32", residents: 176, status: "Suspended", location: "Enugu, Enugu State",         created: "Sep 12, 2025", image: "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=400&q=80" },
-];
-
-const residentsList: Resident[] = [
-  { name: "Samuel Bello",     email: "sam.bello@gmail.com", unit: "Block A – 12", phone: "0803 456 7821", status: "Active",   avatar: "https://i.pravatar.cc/150?img=1"  },
-  { name: "Aisha Lawal",      email: "sam.bello@gmail.com", unit: "Block A – 20", phone: "0803 456 7821", status: "Active",   avatar: "https://i.pravatar.cc/150?img=5"  },
-  { name: "Daniel Ogun",      email: "sam.bello@gmail.com", unit: "Block C – 15", phone: "0803 456 7821", status: "Inactive", avatar: "https://i.pravatar.cc/150?img=8"  },
-  { name: "Blessing Uche",    email: "sam.bello@gmail.com", unit: "Block C – 07", phone: "0803 456 7821", status: "Active",   avatar: "https://i.pravatar.cc/150?img=9"  },
-  { name: "Ibrahim Musa",     email: "sam.bello@gmail.com", unit: "Block A – 08", phone: "0803 456 7821", status: "Active",   avatar: "https://i.pravatar.cc/150?img=12" },
-  { name: "Victor Onyekachi", email: "sam.bello@gmail.com", unit: "Block D – 16", phone: "0803 456 7821", status: "Active",   avatar: "https://i.pravatar.cc/150?img=15" },
-  { name: "Yusuf Abdullahi",  email: "sam.bello@gmail.com", unit: "Block B – 02", phone: "0803 456 7821", status: "Active",   avatar: "https://i.pravatar.cc/150?img=17" },
-  { name: "Kelvin Eze",       email: "sam.bello@gmail.com", unit: "Block C – 10", phone: "0803 456 7821", status: "Active",   avatar: "https://i.pravatar.cc/150?img=20" },
-];
 
 export default function SocietyDetailPage() {
   const params   = useParams();
@@ -47,7 +19,33 @@ export default function SocietyDetailPage() {
   const [resSearch, setResSearch]   = useState("");
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  const society = societies.find((s) => s.id === params.id);
+  const societyId = Array.isArray(params.id) ? params.id[0] : (params.id as string);
+  const [society, setSociety]           = useState<Society | null>(null);
+  const [residentsList, setResidents]  = useState<Resident[]>([]);
+  const [loading, setLoading]          = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const d = await fetchSociety(societyId);
+        if (!d) { if (!cancelled) setLoading(false); return; }
+        const [admin, residents] = await Promise.all([
+          d.residentAdmin ? fetchAdmin(d.residentAdmin) : Promise.resolve(null),
+          fetchSocietyResidents(societyId),
+        ]);
+        if (cancelled) return;
+        const admins = new Map(admin ? [[admin.uid, admin] as const] : []);
+        setSociety(toSociety(d, admins, new Map([[d.id, residents.length]])));
+        setResidents(residents);
+      } catch (err) {
+        console.error("[society detail] load failed", err);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [societyId]);
 
   const filteredResidents = residentsList.filter((r) =>
     r.name.toLowerCase().includes(resSearch.toLowerCase())
@@ -56,7 +54,7 @@ export default function SocietyDetailPage() {
   if (!society) {
     return (
       <div className={`${montserrat.className} flex items-center justify-center h-screen text-sm text-gray-400`}>
-        Society not found.
+        {loading ? "Loading…" : "Society not found."}
       </div>
     );
   }
@@ -93,7 +91,7 @@ export default function SocietyDetailPage() {
 
           {/* Left Panel */}
           <div className={leftPanel.card}>
-            <img src={society.image} alt={society.name} className={leftPanel.bannerImg} />
+            <img src={society.image || "/sidebar/logo.png"} alt={society.name} className={leftPanel.bannerImg} />
             <div className={leftPanel.name}>{society.name}</div>
             <span className={society.status === "Active" ? leftPanel.statusActive : leftPanel.statusSusp}>
               {society.status}
@@ -105,7 +103,7 @@ export default function SocietyDetailPage() {
             <div className={leftPanel.adminRow}>
               <img src={society.adminAvatar} alt={society.admin} className={leftPanel.adminAvatar} />
               <div className={leftPanel.adminInfo}>
-                {society.admin} ({society.adminEmail})
+                {society.adminEmail ? `${society.admin} (${society.adminEmail})` : society.admin}
               </div>
             </div>
           </div>
@@ -142,8 +140,8 @@ export default function SocietyDetailPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredResidents.map((r, i) => (
-                    <tr key={i} className={resTable.tr}>
+                  {filteredResidents.map((r) => (
+                    <tr key={r.uid} className={resTable.tr}>
                       <td className={resTable.residentCell}>
                         <div className={resTable.residentRow}>
                           <img src={r.avatar} alt={r.name} className={resTable.residentAvatar} />

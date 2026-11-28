@@ -82,6 +82,10 @@ service cloud.firestore {
     // Added alongside the existing mobile-app rules; these only ever ADD access.
     match /resident-admins/{uid} {
       allow get, list: if isSuperAdmin();
+      // Super Admin may assign a society and approve/suspend an admin, nothing else.
+      allow update: if isSuperAdmin()
+        && request.resource.data.diff(resource.data).affectedKeys()
+             .hasOnly(['societyID', 'status']);
     }
     match /residents/{uid} {
       allow get, list: if isSuperAdmin();
@@ -99,6 +103,9 @@ service cloud.firestore {
     // -------- societies --------
     match /societies/{societyId} {
       allow read: if isSignedIn();
+
+      // Super Admin manages societies from the admin panel.
+      allow create, update, delete: if isSuperAdmin();
 
       allow update: if isAdmin()
         && request.resource.data.diff(resource.data).affectedKeys()

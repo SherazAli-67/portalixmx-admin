@@ -1,40 +1,34 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Sidebar from "@/components/Sidebar";
 import Header from "@/components/Header";
 import { page, header, search, table, dropdown, modal, confirm } from "./societies.styles";
+import {
+  subscribeSocieties, fetchAdmins, fetchResidentCounts, toSociety,
+  createSociety, updateSociety, setSocietyStatus, deleteSociety as removeSociety,
+} from "@/services/societies";
+import type { AdminOption, Society, SocietyDoc, SocietyFormInput, SocietyStatus } from "@/types/society";
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
 
-const societies = [
-  { id: "1", name: "Ikoyi Phase 1",   admin: "Alex Johnson",   adminAvatar: "https://i.pravatar.cc/150?img=11", residents: 120, status: "Active"    },
-  { id: "2", name: "Lekki Garden",    admin: "Sarah Williams", adminAvatar: "https://i.pravatar.cc/150?img=47", residents: 101, status: "Suspended" },
-  { id: "3", name: "Palmview Estate", admin: "Chinedu Obi",    adminAvatar: "https://i.pravatar.cc/150?img=14", residents: 98,  status: "Active"    },
-  { id: "4", name: "Emerald Park",    admin: "Nkechi Eze",     adminAvatar: "https://i.pravatar.cc/150?img=44", residents: 80,  status: "Active"    },
-  { id: "5", name: "Rosewood Estate", admin: "Halima Musa",    adminAvatar: "https://i.pravatar.cc/150?img=25", residents: 100, status: "Active"    },
-  { id: "6", name: "Harmony Court",   admin: "Kelechi Onu",    adminAvatar: "https://i.pravatar.cc/150?img=32", residents: 176, status: "Suspended" },
-];
-
 const menuActions = ["View", "Edit", "Suspend", "Delete"];
-
-const adminOptions = [
-  "Alex Johnson", "Sarah Williams", "Chinedu Obi",
-  "Nkechi Eze", "Halima Musa", "Kelechi Onu",
-];
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 interface CreateSocietyForm {
   name: string;
   location: string;
-  admin: string;
+  admin: string; // label chosen in the "Assign Resident Admin" dropdown
   status: string;
   banner: File | null;
 }
 
-type Society = typeof societies[0];
+interface AdminChoice { uid: string; label: string }
+
+const errorMessage = (e: unknown) =>
+  e instanceof Error && e.message ? e.message : "Something went wrong. Please try again.";
 
 // ─── Dropdown Menu ────────────────────────────────────────────────────────────
 
@@ -153,8 +147,16 @@ function CloseBtn({ onClose }: { onClose: () => void }) {
 
 // ─── Create Society Modal ─────────────────────────────────────────────────────
 
-function CreateSocietyModal({ onClose, onSubmit }: { onClose: () => void; onSubmit: (d: CreateSocietyForm) => void }) {
+function CreateSocietyModal({ onClose, onSubmit, adminOptions }: { onClose: () => void; onSubmit: (d: CreateSocietyForm) => Promise<void>; adminOptions: string[] }) {
   const [form, setForm] = useState<CreateSocietyForm>({ name: "", location: "", admin: "", status: "Active", banner: null });
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
+  const submit = async () => {
+    if (!form.name.trim() || saving) return;
+    setSaving(true); setError("");
+    try { await onSubmit(form); onClose(); }
+    catch (e) { setError(errorMessage(e)); setSaving(false); }
+  };
   const [preview, setPreview] = useState<string | null>(null);
   const overlayRef = useRef<HTMLDivElement>(null);
 
@@ -189,10 +191,12 @@ function CreateSocietyModal({ onClose, onSubmit }: { onClose: () => void; onSubm
         <SelectField label="Assign Resident Admin" value={form.admin} onChange={v => setForm(f => ({ ...f, admin: v }))} options={adminOptions} />
         <SelectField label="Status" value={form.status} onChange={v => setForm(f => ({ ...f, status: v }))} options={["Active", "Suspended"]} />
 
+        {error && <p className="text-[13px] text-[#CC3333] mb-2">{error}</p>}
         <div className={modal.btnRow}>
           <button onClick={onClose} className={modal.cancelBtn}>Cancel</button>
           <button
-            onClick={() => { if (form.name.trim()) { onSubmit(form); onClose(); } }}
+            onClick={submit}
+            disabled={saving}
             className={`${modal.submitBtn} ${form.name.trim() ? modal.submitActive : modal.submitDisabled}`}
           >
             Submit
@@ -205,9 +209,17 @@ function CreateSocietyModal({ onClose, onSubmit }: { onClose: () => void; onSubm
 
 // ─── Edit Society Modal ───────────────────────────────────────────────────────
 
-function EditSocietyModal({ society, onClose, onSubmit }: { society: Society; onClose: () => void; onSubmit: (d: CreateSocietyForm) => void }) {
-  const [form, setForm] = useState<CreateSocietyForm>({ name: society.name, location: "", admin: society.admin, status: society.status, banner: null });
-  const [preview, setPreview] = useState<string | null>(society.adminAvatar);
+function EditSocietyModal({ society, onClose, onSubmit, adminOptions, currentAdminLabel }: { society: Society; onClose: () => void; onSubmit: (d: CreateSocietyForm) => Promise<void>; adminOptions: string[]; currentAdminLabel: string }) {
+  const [form, setForm] = useState<CreateSocietyForm>({ name: society.name, location: society.location, admin: currentAdminLabel, status: society.status, banner: null });
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
+  const submit = async () => {
+    if (!form.name.trim() || saving) return;
+    setSaving(true); setError("");
+    try { await onSubmit(form); onClose(); }
+    catch (e) { setError(errorMessage(e)); setSaving(false); }
+  };
+  const [preview, setPreview] = useState<string | null>(society.image || null);
   const overlayRef = useRef<HTMLDivElement>(null);
 
   const handleBanner = (file: File | null) => {
@@ -241,10 +253,12 @@ function EditSocietyModal({ society, onClose, onSubmit }: { society: Society; on
         <SelectField label="Assign Resident Admin" value={form.admin} onChange={v => setForm(f => ({ ...f, admin: v }))} options={adminOptions} />
         <SelectField label="Status" value={form.status} onChange={v => setForm(f => ({ ...f, status: v }))} options={["Active", "Suspended"]} />
 
+        {error && <p className="text-[13px] text-[#CC3333] mb-2">{error}</p>}
         <div className={modal.btnRow}>
           <button onClick={onClose} className={modal.cancelBtn}>Cancel</button>
           <button
-            onClick={() => { if (form.name.trim()) { onSubmit(form); onClose(); } }}
+            onClick={submit}
+            disabled={saving}
             className={`${modal.submitBtn} ${form.name.trim() ? modal.submitActive : modal.submitDisabled}`}
           >
             Submit
@@ -260,9 +274,17 @@ function EditSocietyModal({ society, onClose, onSubmit }: { society: Society; on
 function ConfirmModal({ title, message, confirmLabel, confirmColor, confirmHover, onClose, onConfirm }: {
   title: string; message: string; confirmLabel: string;
   confirmColor: string; confirmHover: string;
-  onClose: () => void; onConfirm: () => void;
+  onClose: () => void; onConfirm: () => void | Promise<void>;
 }) {
   const overlayRef = useRef<HTMLDivElement>(null);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+  const handleConfirm = async () => {
+    if (busy) return;
+    setBusy(true); setError("");
+    try { await onConfirm(); onClose(); }
+    catch (e) { setError(errorMessage(e)); setBusy(false); }
+  };
   return (
     <div ref={overlayRef} onClick={e => e.target === overlayRef.current && onClose()} className={confirm.overlay}>
       <style>{`@keyframes slideUp { from { opacity:0; transform:translateY(20px) scale(0.97); } to { opacity:1; transform:translateY(0) scale(1); } }`}</style>
@@ -279,11 +301,13 @@ function ConfirmModal({ title, message, confirmLabel, confirmColor, confirmHover
         </div>
 
         <p className={confirm.body}>{message}</p>
+        {error && <p className="text-[13px] text-[#CC3333] px-1 mb-2">{error}</p>}
 
         <div className={confirm.btnRow}>
           <button onClick={onClose} className={confirm.cancelBtn}>Cancel</button>
           <button
-            onClick={() => { onConfirm(); onClose(); }}
+            onClick={handleConfirm}
+            disabled={busy}
             className={confirm.confirmBtn}
             style={{ background: confirmColor }}
             onMouseEnter={e => (e.currentTarget.style.background = confirmHover)}
@@ -308,6 +332,52 @@ export default function SocietiesPage() {
   const [editSociety, setEditSociety]       = useState<Society | null>(null);
   const [deleteSociety, setDeleteSociety]   = useState<Society | null>(null);
   const [suspendSociety, setSuspendSociety] = useState<Society | null>(null);
+
+  const [docs, setDocs]       = useState<SocietyDoc[]>([]);
+  const [admins, setAdmins]   = useState<AdminOption[]>([]);
+  const [counts, setCounts]   = useState<Map<string, number>>(new Map());
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const unsub = subscribeSocieties(
+      (d) => { setDocs(d); setLoading(false); },
+      (err) => { console.error("[societies] subscribe failed", err); setLoading(false); },
+    );
+    fetchAdmins().then(setAdmins).catch((err) => console.error("[societies] admins failed", err));
+    return unsub;
+  }, []);
+
+  // Resident counts are refreshed whenever the list of societies changes.
+  const idsKey = docs.map(d => d.id).join(",");
+  useEffect(() => {
+    if (!idsKey) return;
+    let cancelled = false;
+    fetchResidentCounts(idsKey.split(",")).then(c => { if (!cancelled) setCounts(c); });
+    return () => { cancelled = true; };
+  }, [idsKey]);
+
+  const societies: Society[] = useMemo(() => {
+    const byUid = new Map(admins.map(a => [a.uid, a]));
+    return docs.map(d => toSociety(d, byUid, counts));
+  }, [docs, admins, counts]);
+
+  // Admins that can be assigned: anyone who is not already the admin of another society.
+  const adminChoices = (exceptSocietyId?: string): AdminChoice[] => {
+    const free = admins.filter(a => !docs.some(d => d.residentAdmin === a.uid && d.id !== exceptSocietyId));
+    const seen = new Map<string, number>();
+    free.forEach(a => seen.set(a.name, (seen.get(a.name) ?? 0) + 1));
+    return free
+      .map(a => ({ uid: a.uid, label: (seen.get(a.name) ?? 0) > 1 && a.email ? `${a.name} (${a.email})` : a.name }))
+      .sort((x, y) => x.label.localeCompare(y.label));
+  };
+
+  const toInput = (d: CreateSocietyForm, choices: AdminChoice[]): SocietyFormInput => ({
+    name: d.name,
+    location: d.location,
+    adminUid: choices.find(c => c.label === d.admin)?.uid ?? "",
+    status: (d.status === "Suspended" ? "Suspended" : "Active") as SocietyStatus,
+    banner: d.banner,
+  });
 
   const filtered = societies.filter(s =>
     s.name.toLowerCase().includes(searchVal.toLowerCase()) ||
@@ -371,7 +441,7 @@ export default function SocietiesPage() {
                 <tbody>
                   {filtered.map((s, i) => (
                     <tr
-                      key={i}
+                      key={s.id}
                       className={`${table.tr} cursor-pointer hover:bg-[#FAFAFA] transition-colors duration-100`}
                       onClick={() => handleRowClick(s)}
                     >
@@ -423,7 +493,7 @@ export default function SocietiesPage() {
                   ))}
                   {filtered.length === 0 && (
                     <tr>
-                      <td colSpan={5} className={table.emptyCell}>No societies found.</td>
+                      <td colSpan={5} className={table.emptyCell}>{loading ? "Loading societies…" : "No societies found."}</td>
                     </tr>
                   )}
                 </tbody>
@@ -435,17 +505,27 @@ export default function SocietiesPage() {
       </div>
 
       {showCreate && (
-        <CreateSocietyModal onClose={() => setShowCreate(false)} onSubmit={d => console.log("New:", d)} />
+        <CreateSocietyModal
+          onClose={() => setShowCreate(false)}
+          adminOptions={adminChoices().map(c => c.label)}
+          onSubmit={async d => { await createSociety(toInput(d, adminChoices())); }}
+        />
       )}
       {editSociety && (
-        <EditSocietyModal society={editSociety} onClose={() => setEditSociety(null)} onSubmit={d => console.log("Updated:", d)} />
+        <EditSocietyModal
+          society={editSociety}
+          onClose={() => setEditSociety(null)}
+          adminOptions={adminChoices(editSociety.id).map(c => c.label)}
+          currentAdminLabel={adminChoices(editSociety.id).find(c => c.uid === editSociety.adminUid)?.label ?? ""}
+          onSubmit={async d => { await updateSociety(editSociety, toInput(d, adminChoices(editSociety.id))); }}
+        />
       )}
       {deleteSociety && (
         <ConfirmModal
           title="Delete Society"
           message={`This action will permanently remove this society from Portalix. This cannot be undone.`}
           confirmLabel="Delete" confirmColor="#E87A00" confirmHover="#EA6C0E"
-          onClose={() => setDeleteSociety(null)} onConfirm={() => console.log("Deleted:", deleteSociety.id)}
+          onClose={() => setDeleteSociety(null)} onConfirm={() => removeSociety(deleteSociety)}
         />
       )}
       {suspendSociety && (
@@ -453,7 +533,7 @@ export default function SocietiesPage() {
           title="Suspend Society"
           message={`This action will temporarily suspend this society. This can be reversed later.`}
           confirmLabel="Suspend" confirmColor="#E87A00" confirmHover="#EA6C0E"
-          onClose={() => setSuspendSociety(null)} onConfirm={() => console.log("Suspended:", suspendSociety.id)}
+          onClose={() => setSuspendSociety(null)} onConfirm={() => setSocietyStatus(suspendSociety.id, "Suspended")}
         />
       )}
     </div>
