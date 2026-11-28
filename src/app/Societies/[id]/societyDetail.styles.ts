@@ -2,7 +2,7 @@
 // All Tailwind className strings for SocietyDetailPage
 
 export const page = {
-  wrapper:        "flex h-screen bg-[#FAFAFA] overflow-hidden",
+  wrapper:        "font-[Montserrat] flex h-screen bg-[#FAFAFA] overflow-hidden",
   content:        "flex flex-1 flex-col overflow-hidden",
 };
 

@@ -1,10 +1,13 @@
 "use client";
 
 import { useState } from "react";
+import { Montserrat } from "next/font/google";
 import { useParams, useRouter } from "next/navigation";
 import Sidebar from "@/components/Sidebar";
 import Header from "@/components/Header";
 import { page, breadcrumb, layout, leftPanel, rightPanel, resTable } from "./societyDetail.styles";
+
+const montserrat = Montserrat({ subsets: ["latin"] });
 
 interface Society {
   id: string; name: string; admin: string; adminEmail: string;
@@ -52,14 +55,14 @@ export default function SocietyDetailPage() {
 
   if (!society) {
     return (
-      <div className="flex items-center justify-center h-screen text-sm text-gray-400">
+      <div className={`${montserrat.className} flex items-center justify-center h-screen text-sm text-gray-400`}>
         Society not found.
       </div>
     );
   }
 
   return (
-    <div className={page.wrapper}>
+    <div className={`${montserrat.className} ${page.wrapper}`}>
       <Sidebar
         activeNav={activeNav}
         setActiveNav={setActiveNav}

@@ -78,6 +78,24 @@ service cloud.firestore {
       allow list, create, update, delete: if false;
     }
 
+    // -------- Super Admin read access (admin panel) --------
+    // Added alongside the existing mobile-app rules; these only ever ADD access.
+    match /resident-admins/{uid} {
+      allow get, list: if isSuperAdmin();
+    }
+    match /residents/{uid} {
+      allow get, list: if isSuperAdmin();
+    }
+    match /payments_to_admin/{paymentId} {
+      allow get, list: if isSuperAdmin();
+    }
+    match /payments/{paymentId} {
+      allow get, list: if isSuperAdmin();
+    }
+    match /support_tickets/{ticketId} {
+      allow get, list: if isSuperAdmin();
+    }
+
     // -------- societies --------
     match /societies/{societyId} {
       allow read: if isSignedIn();
